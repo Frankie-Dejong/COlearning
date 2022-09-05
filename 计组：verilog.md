@@ -331,7 +331,7 @@ assign #5 b = a;        // b 为 wire 型，将表达式右边的值延时 5 个
 
 ## 宏定义的简单使用
 
-![截屏2022-08-27 下午7.48.31](/Users/mac/Library/Application Support/typora-user-images/截屏2022-08-27 下午7.48.31.png)
+![截屏2022-08-27 下午7.48.31](https://github.com/Frankie-Dejong/COlearning/blob/Verilog/images_verilog/截屏2022-08-27%20下午7.48.31.png?raw=true)
 
 # Verilog：设计、开发与调试
 
