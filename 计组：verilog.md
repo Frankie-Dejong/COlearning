@@ -327,7 +327,7 @@ assign #5 b = a;        // b 为 wire 型，将表达式右边的值延时 5 个
 
 这是因为verilog非常逆天的符号判定与强制转换。具体如下：
 
-![截屏2022-08-27 下午7.45.29](/Users/mac/Library/Application Support/typora-user-images/截屏2022-08-27 下午7.45.29.png)
+![截屏2022-08-27 下午7.45.29](https://github.com/Frankie-Dejong/COlearning/blob/Verilog/images_verilog/截屏2022-08-27%20下午7.45.29.png?raw=true)
 
 ## 宏定义的简单使用
 
