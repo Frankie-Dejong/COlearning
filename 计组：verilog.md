@@ -375,7 +375,7 @@ end
 
 Verilog综合时，寄存器通常会被综合为D触发器：
 
-<img src="/Users/mac/Library/Application Support/typora-user-images/截屏2022-08-28 下午6.33.25.png" alt="截屏2022-08-28 下午6.33.25" style="zoom:50%;" />
+<img src="https://github.com/Frankie-Dejong/COlearning/blob/Verilog/images_verilog/截屏2022-08-28%20下午6.33.25.png?raw=true" alt="截屏2022-08-28 下午6.33.25" style="zoom:50%;" />
 
 因此只有一个时钟输入和数据输入。所以每个寄存器只能属于一个时钟域（指只能由一个时钟信号进行驱动）。例如以下代码会使寄存器属于两个时钟域，因此是不可综合的：
 
