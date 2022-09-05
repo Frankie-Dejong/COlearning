@@ -321,7 +321,7 @@ assign #5 b = a;        // b 为 wire 型，将表达式右边的值延时 5 个
 
 ![截屏2022-08-27 下午7.44.19](https://github.com/Frankie-Dejong/COlearning/blob/Verilog/images_verilog/截屏2022-08-27%20下午7.44.19.png?raw=true)
 
-![截屏2022-08-27 下午7.44.36](/Users/mac/Library/Application Support/typora-user-images/截屏2022-08-27 下午7.44.36.png)
+![截屏2022-08-27 下午7.44.36](https://github.com/Frankie-Dejong/COlearning/blob/Verilog/images_verilog/截屏2022-08-27%20下午7.44.36.png?raw=true)
 
 可以发现ans2和ans3是不一致的。
 
