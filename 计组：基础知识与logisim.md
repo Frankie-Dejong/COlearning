@@ -134,7 +134,7 @@ Tunnel 部件可以将输入和输出直接联系起来，跳过中间纷繁复�
 
 实际上即为一个P型晶体管和N型晶体管的集合，只有当两者都导通时该部件才导通。
 
-<img src="/Users/mac/Library/Application Support/typora-user-images/截屏2022-08-14 下午9.00.57.png#pic_center" alt="截屏2022-08-14 下午9.00.57" style="zoom:50%;" />
+<img src="https://github.com/Frankie-Dejong/COlearning/blob/Logisim/images_logisim/截屏2022-08-14%20下午9.00.57.png?raw=true" alt="截屏2022-08-14 下午9.00.57" style="zoom:50%;" />
 
 ### Bit Extender
 
