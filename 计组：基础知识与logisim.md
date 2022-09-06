@@ -128,7 +128,7 @@ Tunnel 部件可以将输入和输出直接联系起来，跳过中间纷繁复�
 
 即半导体，P型在gate为0时导通，N型在gate为1时导通。
 
-### <img src="/Users/mac/Library/Application Support/typora-user-images/截屏2022-08-14 下午8.51.43.png" alt="截屏2022-08-14 下午8.51.43" style="zoom:50%;" />
+### <img src="https://github.com/Frankie-Dejong/COlearning/blob/Logisim/images_logisim/截屏2022-08-14%20下午8.51.43.png?raw=true" alt="截屏2022-08-14 下午8.51.43" style="zoom:50%;" />
 
 ### Transmission Gate
 
