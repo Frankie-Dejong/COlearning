@@ -40,7 +40,7 @@
 
 这32个寄存器可以按照序号命名，也可以按照功能命名，作用如下：
 
-<img src="/Users/mac/Library/Application Support/typora-user-images/截屏2022-08-30 下午7.43.49.png" alt="截屏2022-08-30 下午7.43.49" style="zoom:50%;" />
+<img src="https://github.com/Frankie-Dejong/COlearning/blob/MIPS/截屏2022-08-30%20下午7.43.49.png?raw=true" alt="截屏2022-08-30 下午7.43.49" style="zoom:50%;" />
 
 特别的，对于`$0`和`$1`两个寄存器：
 
