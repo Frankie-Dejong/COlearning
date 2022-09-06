@@ -280,7 +280,7 @@ ROM只可读不可写，有手动和文件导入两种存储形式。若是采�
 
 有些时候我们需要初始化寄存器的数据（默认为0），这是我们可以使用一个这样的电路。
 
-![截屏2022-08-25 下午7.09.24](/Users/mac/Library/Application Support/typora-user-images/截屏2022-08-25 下午7.09.24.png)
+![截屏2022-08-25 下午7.09.24](https://github.com/Frankie-Dejong/COlearning/blob/Logisim/images_logisim/截屏2022-08-25%20下午7.09.24.png?raw=true)
 
 将counter的位数设置为1，最大值设置为1。并选择stay at value选项。这样在第一个时钟周期时counter会
 
