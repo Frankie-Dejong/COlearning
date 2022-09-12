@@ -378,7 +378,425 @@ ini_end:
 ```
 
 和define相同，编译时会将所有的EQV_NAME替换为string，常用来定义常量。
+# 函数调用
 
+在这里单独将函数的调用作为一章，因为他很难！而且很重要！
+
+函数的特点如下：
+
+* 函数是一个代码块，可以由指定语句调用，并且在执行完毕后返回调用语句
+* 函数可以通过传参实现代码的复用
+* 函数只能通过返回值等对函数外造成影响
+* 函数里依然可以嵌套函数
+
+对于函数调用，最简单的形式如下：
+
+```assembly
+# function call
+jal funtion_name
+
+
+# function
+function_name:
+    <function-content>
+    jr $ra
+```
+
+​	那么为什么我们选择了jal而不是j呢？因为jal在跳转的同时会将PC+4的值写入ra寄存器当中，这样当我们执行jr指令的时候，就正好会跳转到函数调用指令的下一条！非常的方便快捷。
+
+## 代码的复用
+
+​	在使用的过程中，为了能顺利的多次复用代码，我们必须使用固定的形参寄存器`$a0,$a1,$a2,$a3`来存储传入函数的形参，同样的，我们对于函数的返回值也需要规定固定的寄存器。
+
+例如翻译一个这样的函数
+
+```c
+int sum(int a, int b)
+{
+    int tmp = a + b;
+    return tmp;
+}
+
+int main()
+{
+    int a = 2;
+    int b = 3;
+    int c = 4;
+    int d = 5;
+
+    int sum1 = sum(a, b);
+    printf("%d", sum1);
+    sum2 = sum(c, d);
+    printf("%d", sum2);
+    return 0;
+}
+```
+
+它所对应的汇编语言应该像这样：
+
+```assembly
+.macro end
+    li      $v0, 10
+    syscall
+.end_macro
+
+.macro printStr(%str)
+    la      $a0, %str
+    li      $v0, 4
+    syscall
+.end_macro
+
+.data
+space: .asciiz " "
+
+.text
+li      $s0, 2
+li      $s1, 3
+li      $s2, 4
+li      $s3, 5
+
+move    $a0, $s0 #传参
+move    $a1, $s1
+jal     sum
+move    $s4, $v0 #获得返回值
+
+li      $v0, 1
+move    $a0, $s4
+syscall
+
+printStr(space)
+
+move    $a0, $s2
+move    $a1, $s3
+jal     sum
+move    $s5, $v0
+
+li      $v0, 1
+move    $a0, $s5
+syscall
+
+end
+
+sum:
+#传参过程
+move    $t0, $a0
+move    $t1, $a1
+#函数过程
+add     $v0, $t0, $t1
+jr      $ra
+```
+
+​	如果函数需要使用的参数小于4个，一般地，我们应当使用上述的4个寄存器，否则应该将多出的参数存入内存当中。并使用控制栈寄存器`$sp`，完成对内存的访问。
+
+## 避免对外界产生影响	
+
+​	为了避免对外界函数产生影响，在函数中我们可以使用临时寄存器，但是必须将临时寄存器的原值提前存入到内存当中。这个过程是一个入栈的过程，以方便我们在函数调用结束之后将这些数据逐一的存放回原来的寄存器当中。
+
+​	例如这样的一段代码
+
+```c
+int sum(int a, int b)
+{
+    int tmp = a + b;
+    return tmp;
+}
+
+int main()
+{
+    int a = 2;
+    int b = 3;
+    int c = 4;
+    int sum1 = sum(a, b);
+    int sum2 = sum(sum1, c);
+    printf("%d", sum2);
+    return 0;
+}
+```
+
+​	翻译成汇编语言之后应该变成这样：
+
+​	调用者维护栈：
+
+```assembly
+.macro end
+    li      $v0, 10
+    syscall
+.end_macro
+
+.text
+li      $s0, 2
+li      $s1, 3
+li      $t0, 4
+
+move    $a0, $s0 #传参
+move    $a1, $s1
+sw      $t0, 0($sp) #入栈
+addi    $sp, $sp, -4
+jal     sum
+addi    $sp, $sp, 4 #出栈
+lw      $t0, 0($sp) 
+move    $s4, $v0 #获得返回值
+
+move    $a0, $s4
+move    $a1, $t0
+sw      $t0, 0($sp) #入栈
+addi    $sp, $sp, -4
+jal     sum
+addi    $sp, $sp, 4 #出栈
+lw      $t0, 0($sp)
+move    $s5, $v0
+
+li      $v0, 1
+move    $a0, $s5
+syscall
+
+end
+
+sum:
+#传参过程
+move    $t0, $a0
+move    $t1, $a1
+#函数过程
+add     $v0 $t0, $t1
+jr      $ra
+```
+
+​	被调用者维护栈：
+
+```assembly
+.macro end
+    li      $v0, 10
+    syscall
+.end_macro
+
+.text
+li      $s0, 2
+li      $s1, 3
+li      $t0, 4
+
+move    $a0, $s0 #传参
+move    $a1, $s1
+jal     sum
+move    $s4, $v0 #获得返回值
+
+move    $a0, $s4
+move    $a1, $t0
+jal     sum
+move    $s5, $v0
+
+li      $v0, 1
+move    $a0, $s5
+syscall
+
+end
+
+sum:
+#入栈过程
+sw      $t0, 0($sp)
+addi    $sp, $sp, -4
+#传参过程
+move    $t0, $a0
+move    $t1, $a1
+#函数过程
+add     $v0 $t0, $t1
+#出栈过程
+addi    $sp, $sp, 4
+lw      $t0, 0($sp)
+#return
+jr      $ra
+```
+
+## 嵌套函数调用
+
+​	不难发现，上述的努力都是由于寄存器数量数有限的，而我们在多次代码复用的过程中不可避免的需要多次重复使用这些寄存器。因此，需要通过频繁的出入栈来将寄存器中的数据存储到内存中，以避免在复用的过程中造成数据的丢失。
+
+​	那么很容易想到，一旦出现了函数嵌套的情况，我们的`$ra`寄存器就将供不应求，因此我们依然需要通过内存来暂时存储函数的返回值。
+
+​	例如这样的一个程序：
+
+```c
+int sum(int a, int b)
+{
+    return a + b;
+}
+int cal(int a, int b)
+{
+    return a - sum(b, a);
+}
+
+int main()
+{
+    int a = 2;
+    int b = 3;
+    int ans = cal(2, 3);
+    printf("%d", ans);
+}
+```
+
+翻译之后应该变成这样：
+
+```assembly
+.macro end
+    li $v0, 10
+    syscall
+.end_macro
+
+.text
+li      $s0, 2
+li      $s1, 3
+
+move    $a0, $s0
+move    $a1, $s1
+jal     cal
+move    $s5, $v0
+
+li      $v0, 1
+move    $a0, $s5
+syscall
+
+end
+
+sum:
+#将 $t0 和 $t1 入栈
+sw      $t0, 0($sp)
+addi    $sp, $sp, -4
+sw      $t1, 0($sp)
+addi    $sp, $sp, -4
+#传参过程
+move    $t0, $a0
+move    $t1, $a1
+#函数过程
+add     $v0 $t0, $t1
+#将 $t0 和 $t1 出栈
+addi    $sp, $sp, 4
+lw      $t1, 0($sp) 
+addi    $sp, $sp, 4
+lw      $t0, 0($sp) 
+#return
+jr      $ra
+
+cal:
+#将 $ra 入栈
+sw      $ra, 0($sp)
+addi    $sp, $sp, -4
+#调用者维护
+#传参过程
+move    $t0, $a0
+move    $t1, $a1
+#调用 sum 的过程
+move    $a0, $t1
+move    $a1, $t0
+jal     sum
+move    $t2, $v0
+#运算a-sum(b, a)
+sub     $v0, $t0, $t2
+#将ra出栈
+addi    $sp, $sp, 4
+lw      $ra, 0($sp) 
+#return
+jr      $ra
+```
+
+## 递归函数调用
+
+递归函数的本质就是一个**在函数体内部调用自身的嵌套函数**。
+
+例如实现一个阶乘程序，C语言的递归实现方式如下：
+
+```C
+#include <stdio.h>
+
+int factorial(int n)
+{
+    if (n == 1)
+    {
+        return 1;
+    }
+    else
+    {
+        return n * factorial(n - 1);
+    }
+}
+
+int main()
+{
+    printf("%d\n", factorial(5));
+
+    return 0;
+}
+```
+
+汇编语言的版本如下：
+
+```assembly
+.macro end
+    li      $v0, 10
+    syscall
+.end_macro
+
+.macro getInt(%des)
+    li      $v0, 5
+    syscall
+    move    %des, $v0
+.end_macro
+
+.macro printInt(%src)
+    move    $a0, %src
+    li      $v0, 1
+    syscall
+.end_macro
+
+.macro push(%src)
+    sw      %src, 0($sp)
+    subi    $sp, $sp, 4
+.end_macro
+
+.macro pop(%des)
+    addi    $sp, $sp, 4
+    lw      %des, 0($sp) 
+.end_macro
+
+.text
+main:
+    getInt($s0)
+
+    move    $a0, $s0
+    jal     factorial
+    move    $s1, $v0
+
+    printInt($s1)
+    end
+
+factorial:
+    # 入栈
+    push($ra)
+    # 调用者维护（调用自身）
+    push($t0)
+    # 传参
+    move    $t0, $a0
+    #函数过程
+    bne     $t0, 1, else
+    # 基准情况
+    if:
+        li      $v0, 1
+        j       if_end  
+    # 递归情况  
+    else:
+        subi    $t1, $t0, 1
+        move    $a0, $t1
+        jal     factorial
+        mult    $t0, $v0
+        mflo    $v0
+    if_end:
+    # 出栈
+    pop($t0)
+    pop($ra)
+    # 对应的出栈
+    # 返回
+    jr      $ra
+```
+
+大部分的函数都需要遵守入栈-传参-出栈-返回这四个阶段。
 
 
 
