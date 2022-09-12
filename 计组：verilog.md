@@ -228,6 +228,41 @@ always @(posedge clk)begin
   endcase
 end
 ```
+鉴于case语句在一个分支结束之后不会自动落入下一个分支，所以与C不同的是不用在每个分支结尾加上break。但是如果我们要将多个分支合并在一起，可以使用逗号将他们隔开,合并为一个分支：
+
+```verilog
+module top_module (
+    input [3:0] in,
+    output reg [1:0] pos  );
+    
+    always @(*)
+        case(in)
+            4'b0000, 
+            4'b0001, 
+            4'b0011, 
+            4'b0101, 
+            4'b0111, 
+            4'b1001, 
+            4'b1011, 
+            4'b1101, //这里是逗号
+            4'b1111: //这里是冒号
+                pos = 0;
+            4'b0010, 
+            4'b0110, 
+            4'b1010, 
+            4'b1110: 
+                pos = 1;
+            4'b0100, 
+            4'b1100: 
+                pos = 2;
+            4'b1000: 
+                pos = 3;
+        endcase
+
+endmodule
+```
+
+## 
 
 ## for语句和while语句
 
