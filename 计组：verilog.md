@@ -580,5 +580,64 @@ endmodule
 
 ==注意！：上述转换为Mealy型状态机的方法只是投机取巧，并没有按照Mealy型状态机的原理进行设计，不要对理论知识产生影响==
 
+## 同步复位与异步复位
+
+在编写有限状态机的时候，有时题目会要求我们所编写的状态机具有同步or异步复位的功能（应该说所有题目都会要求）
+
+给出方法如下：
+
+**同步复位**
+
+```verilog
+always@(posedge clk) begin
+  if(reset) //reset
+  else begin
+  	//dosomething
+  end
+end
+```
+
+**异步复位**
+
+```verilog
+always @(posedge clk, posedge areset) begin
+  if(reset) // reset
+  else begin
+  	//dosomething
+  end
+end
+```
+
+
+
+## 用寄存器来保存字符串（P1课下附加题）
+
+在遇到匹配特定字符串的问题时，可以用一个位宽为8的倍数的寄存器来存储字符串，并直接进行字符串的比对，这样可以极大的减少我们的工作量。
+
+如下：
+
+```verilog
+reg [55:0] str; // 注意位宽必须为8的倍数，因为单个字符占8位
+always@(posedge clk) begin
+  if(reset) begin
+    // reset
+  end
+  else begin
+    str <= (str << 8) | in;	// 注意这里不能直接相加，因为str和in的位宽不同，可用｜运算代替。
+    if(str[39:0] == " begi") begin
+      // 按照要求选取str的部分与目标字符串进行比较
+      // 需要注意的是由于str在赋值的时候采取了非阻塞赋值法，因此其更新会在本次if判断之后
+      // 所以可以根据需要写成 if(str[39:0] == " begin" && in == "n")来进行判断
+      // do something
+    end
+    else begin
+      // do something
+    end
+  end
+end
+```
+
+
+
 
 
