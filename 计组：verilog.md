@@ -601,7 +601,7 @@ end
 
 ```verilog
 always @(posedge clk, posedge areset) begin
-  if(reset) // reset
+  if(areset) // reset
   else begin
   	//dosomething
   end
